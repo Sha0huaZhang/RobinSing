@@ -1,4 +1,4 @@
-# 由 lyrics\*.txt 生成 src\warble_table.h
+﻿# 由 lyrics\*.txt 生成 src\warble_table.h
 #
 # 元数据（# 开头，顺序随意）：
 #   # name: sway

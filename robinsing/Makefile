@@ -23,11 +23,12 @@ PPC_BIN  := $(DIST)/$(NAME)-darwin-ppc
 LINK_PPC ?= cc -std=gnu99 -O2 -Wall -Wextra -mmacosx-version-min=10.5 -arch ppc
 
 # 交叉编译 Linux（zig 自带的 musl 工具链，产物完全静态，不依赖目标机任何运行库）
-#   make ppc-linux    -> dist/robinsing-linux-ppc     32 位大端 PowerPC
+#   make amd64-linux  -> dist/robinsing-linux-amd64   x86_64
 #   make arm64-linux  -> dist/robinsing-linux-arm64   AArch64
+#   make ppc-linux    -> dist/robinsing-linux-ppc     32 位大端 PowerPC
 ZIG_CC := zig cc -std=c11 -O2 -Wall -Wextra -Werror -Wl,-s -o
 
-.PHONY: all check clean ppc ppc-linux arm64-linux
+.PHONY: all check clean ppc ppc-linux arm64-linux amd64-linux
 .DELETE_ON_ERROR:
 
 all: $(BIN)
@@ -55,6 +56,10 @@ ppc-linux: $(SRC) $(HDR)
 arm64-linux: $(SRC) $(HDR)
 	@mkdir -p $(DIST)
 	$(ZIG_CC) $(DIST)/$(NAME)-linux-arm64 -target aarch64-linux-musl $(SRC)
+
+amd64-linux: $(SRC) $(HDR)
+	@mkdir -p $(DIST)
+	$(ZIG_CC) $(DIST)/$(NAME)-linux-amd64 -target x86_64-linux-musl $(SRC)
 
 check: $(BIN)
 	@echo "  裸 robinsing 进入选歌菜单（EOF 退出 2）"
