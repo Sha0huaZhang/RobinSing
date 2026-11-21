@@ -19,8 +19,14 @@ endif
 
 # PowerPC（Mac OS X 10.5 / gcc 4.2）。现代 clang 已经没有 ppc 后端了，
 # 必须在 ppc 工具链上编：make ppc
+#
+# 工具链从 Xcode 3.2.6 的 dmg 里抽出来（见 Columbula-PowerPC移植方案.md），
+# 装好后 make ppc 直接可用；换位置时用 make ppc XC326=/path/to/xcode326 覆盖
 PPC_BIN  := $(DIST)/$(NAME)-darwin-ppc
-LINK_PPC ?= cc -std=gnu99 -O2 -Wall -Wextra -mmacosx-version-min=10.5 -arch ppc
+XC326    ?= /usr/local/toolchains/xcode326
+PPC_SDK  := $(XC326)/MacOSX10.5.sdk
+PPC_GCC  := $(XC326)/gcc42/bin/powerpc-apple-darwin10-gcc-4.2.1
+LINK_PPC ?= $(PPC_GCC) -isysroot $(PPC_SDK) -std=gnu99 -O2 -Wall -Wextra -mmacosx-version-min=10.5
 
 # 交叉编译 Linux（zig 自带的 musl 工具链，产物完全静态，不依赖目标机任何运行库）
 #   make amd64-linux  -> dist/robinsing-linux-amd64   x86_64
@@ -45,9 +51,12 @@ src/warble_table.h: $(LYRICS) tools/gen_table.awk
 
 # ppc 用 gcc 4.2 编，不带 -Werror：老编译器的 -Wextra 警告比新 clang 多，
 # 一旦 -Werror 会因为无关警告失败
+# gcc-4.2 会去 PATH 里找 as / ld，必须让老工具链排在系统工具之前，
+# 否则会捡到系统的 as（它背后是 clang，直接拒绝 -arch ppc）
 ppc: $(SRC) $(HDR)
+	@test -x $(PPC_GCC) || { echo "缺少 ppc 工具链: $(PPC_GCC)"; exit 1; }
 	@mkdir -p $(DIST)
-	$(LINK_PPC) -o $(PPC_BIN) $(SRC)
+	PATH=$(XC326)/cli/bin:$(XC326)/gcc42/bin:$$PATH $(LINK_PPC) -o $(PPC_BIN) $(SRC)
 
 ppc-linux: $(SRC) $(HDR)
 	@mkdir -p $(DIST)
