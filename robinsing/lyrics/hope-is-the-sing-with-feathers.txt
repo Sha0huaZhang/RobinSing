@@ -1,0 +1,45 @@
+# name: hope
+# title: Hope Is the Thing With Feathers
+
+We rise together as our destiny unfolds, 
+We face the darkness and our trials are yet untold, 
+Through the shadows of despair, 
+Oh, in silence, hopes we share, 
+To chase our dreams that we've declared,[shortsleep] 
+We glimpse, through our eyes, 
+Yet fools, blind our sights, 
+Can't make what they say, 
+We'll find our way, we'll find our way,
+[cstart] [shortsleep]
+Heads up! The wheels are spinning, 
+Across the plains, in valleys deep, 
+To dawn, the wheels that sing, 
+An unending dream![shortsleep]
+Heads up! the tracks are running, 
+Across the plains, where shadows hide, 
+We run, we stride~, 
+[cend][sleep][next]
+In the face of fear and plight, and yet we hold our ground, 
+In life we stand, and strive, our victory is found, 
+And the storms we've weathered through, 
+And we hope in the light of truth, 
+To break free from chains, and come anew, [shortsleep]
+Heads up! The wheels are spinning, 
+Across the plains, in valleys deep, 
+To dawn, the wheels that sing, 
+An unending dream![shortsleep]
+Heads up! the tracks are running, 
+Across the plains, where shadows hide, 
+We run; we stride~, 
+[sleep][next]
+Heads up! A steady rhythm, 
+A destination that's ever near, 
+It comes! Stride to our kingdom, 
+And see the light of day, [shortsleep]
+Heads up! the wheels are singing, 
+The whispers and secrets they'd keep, 
+To hope! We bound~, 
+[estart][sleep][next]
+Break free, we chased our dreams, beneath the starry night, 
+In the face of god, we rose, as one. 
+[eend][next]

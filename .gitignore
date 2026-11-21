@@ -1,0 +1,33 @@
+# 编译产物
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.out
+a.out
+*.pdb
+
+# 可执行文件
+*.exe
+
+# 调试符号
+*.dSYM/
+*.dSYM
+
+# 依赖 / 构建目录
+build/
+dist/
+
+# 生成物
+robinsing/src/warble_table.h
+
+# 编辑器与 IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# macOS 系统文件
+.DS_Store
+._*

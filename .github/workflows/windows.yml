@@ -1,0 +1,63 @@
+name: windows
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*', '[0-9]*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSVC (x64)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build
+        shell: cmd
+        working-directory: robinsing
+        run: |
+          :: 批处理必须用 call 调用，否则 build.bat 结束时不会返回到这里的后续命令
+          call build.bat
+          if errorlevel 1 exit /b 1
+          copy /y dist\robinsing-windows.exe dist\RobinSing.exe
+          if errorlevel 1 exit /b 1
+          dir dist
+
+      - name: Smoke test
+        shell: cmd
+        working-directory: robinsing
+        run: |
+          dist\RobinSing.exe -v
+          (echo 1) | dist\RobinSing.exe -p > out.txt
+          findstr /C:"Sway to My Beat in Cosmos" out.txt
+          findstr /C:"Side by side ~~" out.txt
+          dist\RobinSing.exe hope-is -p > hope.txt
+          findstr /C:"Hope Is the Thing With Feathers" hope.txt
+          dist\RobinSing.exe nope > nope.txt
+          findstr /C:"Shall we board the train for Penacony?" nope.txt
+          dist\RobinSing.exe 1 -c > chorus.txt
+          findstr /C:"No more ties ~~" chorus.txt
+          dist\RobinSing.exe 1 -e > end.txt
+          findstr /C:"Side by side ~~" end.txt
+          certutil -hashfile dist\RobinSing.exe SHA256
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RobinSing-windows-x64
+          path: robinsing/dist/RobinSing.exe
+          if-no-files-found: error
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: robinsing/dist/RobinSing.exe

@@ -1,0 +1,30 @@
+# name: had
+# title: Had I Not Seen the Sun
+
+In candlelight, 
+As time unwinds, 
+I find myself, 
+lost in-your eyes, 
+In midnight tolls, 
+As darkness folds, 
+I see your tears, 
+when we say goodbye, [shortsleep]
+Watching stars as we, 
+drift on by, 
+A touch, a glance, fly away, [shortsleep]
+[cstart]
+Will our paths converge be'neath the sun?
+A silent desire, in melody sung, 
+Beyond this stolen night, 
+We share a cherished dream, 
+between-souls whispered, 
+That it 'seems'...
+[cend][sleep][next]
+Will shooting stars align, be'neath the sun,
+In whispered hopes where journey's begun,
+[estart]
+In dreams we waltz the sky, 
+You watch me drift on by in your memory, 
+A whispered song,[shortsleep] 
+A seed of hope,[shortsleep] where we belong. 
+[eend][next]

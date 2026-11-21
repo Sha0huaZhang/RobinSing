@@ -1,0 +1,11 @@
+# C
+*.c    linguist-language=C
+*.h    linguist-language=C
+
+# C++
+*.cc   linguist-language=C++
+
+* text=auto eol=lf
+
+# 批处理必须 CRLF，否则 cmd.exe 解析 goto 标签和 ^ 续行会出错
+*.bat text eol=crlf
