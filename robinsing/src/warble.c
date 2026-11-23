@@ -21,10 +21,40 @@ void warble_set_color(const char *escape)
     lyric_color = (escape != NULL) ? escape : "";
 }
 
-/* 输出时只隐藏英文逗号和句号；连字符、引号、问号、感叹号等都保留 */
-static int is_hidden(unsigned char c)
+/* 一行里实际输出什么：
+   - ',' 始终不输出；'.' 只有出现在行尾的 .?! 串里才输出；
+   - 行尾空白去掉；结尾是 . ? ! 时原样输出且不再补 ~；
+   - 其它行统一在 ~ 前留一个空格。 */
+struct visible_span {
+    size_t run_start;  /* 行尾 .?! 串的起点 */
+    size_t end;        /* 最后一个可见（非空格）字符之后的位置 */
+    int has_end;       /* 行尾有 . ? ! */
+};
+
+static void scan_visible(const char *line, struct visible_span *v)
 {
-    return c == ',' || c == '.';
+    size_t len = strlen(line);
+    size_t i, last = 0;
+
+    while (len > 0 && (line[len - 1] == ' ' || line[len - 1] == '\t'))
+        len--;
+
+    v->run_start = len;
+    while (v->run_start > 0 &&
+           (line[v->run_start - 1] == '.' || line[v->run_start - 1] == '?' ||
+            line[v->run_start - 1] == '!'))
+        v->run_start--;
+    v->has_end = (v->run_start < len);
+
+    for (i = 0; i < len; i++) {
+        unsigned char c = (unsigned char)line[i];
+
+        if (c == ',') continue;
+        if (c == '.' && i < v->run_start) continue;
+        if (c != ' ' && c != '\t')
+            last = i + 1;
+    }
+    v->end = last;
 }
 
 enum action { A_NONE = 0, A_SLEEP, A_SHORT_SLEEP, A_NEXT };
@@ -82,23 +112,36 @@ struct line_plan {
 static void sing_line(const char *line, long char_ms,
                       const struct line_plan *plan, long long *deadline)
 {
-    const unsigned char *p = (const unsigned char *)line;
+    struct visible_span v;
+    size_t i = 0;
     int tildes = plan->tildes;
 
-    while (*p) {
+    scan_visible(line, &v);
+
+    while (i < v.end) {
+        unsigned char c = (unsigned char)line[i];
         int n;
 
-        if (is_hidden(*p)) { p++; continue; }
-        n = utf8_len(*p);
-        fwrite(p, 1, (size_t)n, stdout);
+        if (c == ',') { i++; continue; }
+        if (c == '.' && i < v.run_start) { i++; continue; }
+
+        n = utf8_len(c);
+        fwrite(line + i, 1, (size_t)n, stdout);
         fflush(stdout);
-        p += n;
+        i += (size_t)n;
         pace(deadline, char_ms);
     }
-    while (tildes-- > 0) {
-        putchar('~');
-        fflush(stdout);
-        pace(deadline, char_ms);
+
+    if (!v.has_end) {
+        if (v.end > 0) {
+            putchar(' ');
+            fflush(stdout);
+        }
+        while (tildes-- > 0) {
+            putchar('~');
+            fflush(stdout);
+            pace(deadline, char_ms);
+        }
     }
     if (plan->hold_ms > 0)
         pace(deadline, plan->hold_ms);
@@ -195,7 +238,8 @@ static void plain_lines(const char *const *lines, size_t count)
         return;
 
     for (i = 0; i < count; i++) {
-        const char *p;
+        struct visible_span v;
+        size_t j = 0;
 
         if (is_action_line(lines[i])) {
             run_actions(lines[i], NULL, 1);
@@ -204,12 +248,26 @@ static void plain_lines(const char *const *lines, size_t count)
         if (i > last)
             continue;
 
-        for (p = lines[i]; *p; p++)
-            if (!is_hidden((unsigned char)*p))
-                putchar(*p);
-        putchar('~');
-        if (i == last)
+        scan_visible(lines[i], &v);
+        while (j < v.end) {
+            unsigned char c = (unsigned char)lines[i][j];
+            int n;
+
+            if (c == ',') { j++; continue; }
+            if (c == '.' && j < v.run_start) { j++; continue; }
+
+            n = utf8_len(c);
+            fwrite(lines[i] + j, 1, (size_t)n, stdout);
+            j += (size_t)n;
+        }
+
+        if (!v.has_end) {
+            if (v.end > 0)
+                putchar(' ');
             putchar('~');
+            if (i == last)
+                putchar('~');
+        }
         putchar('\n');
     }
 }
@@ -243,7 +301,7 @@ static const struct song_alias {
     { "if-i-can-stop-one-heart-from-breaking", "if" },
     { "3", "hope" },
     { "hope", "hope" },
-    { "hope-is-the-sing-with-feathers", "hope" },
+    { "hope-is-the-thing-with-feathers", "hope" },
     { "4", "had" },
     { "had", "had" },
     { "had-i-not-seen-the-sun", "had" },

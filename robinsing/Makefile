@@ -1,7 +1,7 @@
 NAME    := robinsing
 SRC     := src/main.c src/warble.c src/platform.c
 HDR     := src/version.h src/warble.h src/platform.h src/warble_table.h
-LYRICS  := lyrics/sway-the-beat-in-cosmos.txt lyrics/if-i-can-stop-one-heart-from-breaking.txt lyrics/hope-is-the-sing-with-feathers.txt lyrics/had-i-not-seen-the-sun.txt
+LYRICS  := lyrics/sway-the-beat-in-cosmos.txt lyrics/if-i-can-stop-one-heart-from-breaking.txt lyrics/hope-is-the-thing-with-feathers.txt lyrics/had-i-not-seen-the-sun.txt
 CFLAGS  ?= -std=c11 -O2 -Wall -Wextra -Werror
 DIST    := dist
 UNAME_S := $(shell uname -s)
@@ -96,7 +96,7 @@ check: $(BIN)
 	@./$(BIN) if-i-can-stop-one-heart-from-breaking | diff -u tests/expected/if.txt -
 	@./$(BIN) 3 | diff -u tests/expected/hope.txt -
 	@./$(BIN) hope | diff -u tests/expected/hope.txt -
-	@./$(BIN) hope-is-the-sing-with-feathers | diff -u tests/expected/hope.txt -
+	@./$(BIN) hope-is-the-thing-with-feathers | diff -u tests/expected/hope.txt -
 	@./$(BIN) 4 | diff -u tests/expected/had.txt -
 	@./$(BIN) had | diff -u tests/expected/had.txt -
 	@./$(BIN) had-i-not-seen-the-sun | diff -u tests/expected/had.txt -
@@ -171,8 +171,12 @@ check: $(BIN)
 	@echo "  颜色编号"
 	@./$(BIN) --color 200 1 | diff -q tests/expected/sway.txt - >/dev/null
 	@./$(BIN) --color=93 1 | diff -q tests/expected/sway.txt - >/dev/null
+	@./$(BIN) -C 200 1 | diff -q tests/expected/sway.txt - >/dev/null
+	@./$(BIN) -C=93 1 | diff -q tests/expected/sway.txt - >/dev/null
+	@./$(BIN) -C200 1 | diff -q tests/expected/sway.txt - >/dev/null
 	@ROBINSING_COLOR=200 ./$(BIN) 1 | diff -q tests/expected/sway.txt - >/dev/null
 	@! ./$(BIN) --color 300 1 >/dev/null 2>&1
+	@! ./$(BIN) -C 300 1 >/dev/null 2>&1
 	@! ./$(BIN) --color abc 1 >/dev/null 2>&1
 	@! ./$(BIN) --color >/dev/null 2>&1
 	@! ROBINSING_COLOR=999 ./$(BIN) 1 >/dev/null 2>&1

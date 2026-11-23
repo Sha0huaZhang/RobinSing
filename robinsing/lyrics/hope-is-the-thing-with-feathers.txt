@@ -17,7 +17,7 @@ To dawn, the wheels that sing,
 An unending dream![shortsleep]
 Heads up! the tracks are running, 
 Across the plains, where shadows hide, 
-We run, we stride~, 
+We run, we stride, 
 [cend][sleep][next]
 In the face of fear and plight, and yet we hold our ground, 
 In life we stand, and strive, our victory is found, 
@@ -30,7 +30,7 @@ To dawn, the wheels that sing,
 An unending dream![shortsleep]
 Heads up! the tracks are running, 
 Across the plains, where shadows hide, 
-We run; we stride~, 
+We run; we stride, 
 [sleep][next]
 Heads up! A steady rhythm, 
 A destination that's ever near, 
@@ -38,7 +38,7 @@ It comes! Stride to our kingdom,
 And see the light of day, [shortsleep]
 Heads up! the wheels are singing, 
 The whispers and secrets they'd keep, 
-To hope! We bound~, 
+To hope! We bound, 
 [estart][sleep][next]
 Break free, we chased our dreams, beneath the starry night, 
 In the face of god, we rose, as one. 

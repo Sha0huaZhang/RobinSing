@@ -18,7 +18,7 @@ static void usage(FILE *out, const char *prog)
             "曲目（不区分大小写，可只写唯一前缀；不写就进入选歌菜单）:\n"
             "  1 | sway | sway-the-beat-in-cosmos\n"
             "  2 | if   | if-i-can-stop-one-heart-from-breaking\n"
-            "  3 | hope | hope-is-the-sing-with-feathers\n"
+            "  3 | hope | hope-is-the-thing-with-feathers\n"
             "  4 | had  | had-i-not-seen-the-sun\n"
             "\n"
             "选项:\n"
@@ -28,7 +28,7 @@ static void usage(FILE *out, const char *prog)
             "  -p, --plain         强制纯文本输出，无颜色无停顿\n"
             "  -c, --chorus, --climax  只唱高潮段（没标记就唱整首）\n"
             "  -e, --end, --ends       只唱尾声（没标记就唱整首）\n"
-            "  --color <编号>          256 色编号（默认 53）；NO_COLOR / TERM=dumb 时不上色\n"
+            "  -C, --color <编号>      256 色编号（默认 53）；NO_COLOR / TERM=dumb 时不上色\n"
             "  --                      后面的参数都当作曲目，不再解析选项\n"
             "  -v, --version       显示版本\n"
             "  -h, --help          显示本帮助\n"
@@ -252,9 +252,9 @@ int main(int argc, char **argv)
                 return 2;
             }
             part = WARBLE_PART_END;
-        } else if (strcmp(arg, "--color") == 0) {
+        } else if (strcmp(arg, "-C") == 0 || strcmp(arg, "--color") == 0) {
             if (i + 1 >= argc) {
-                fprintf(stderr, "%s: --color 后面要跟一个 0~255 的编号\n", argv[0]);
+                fprintf(stderr, "%s: %s 后面要跟一个 0~255 的编号\n", argv[0], arg);
                 return 2;
             }
             if (parse_color(argv[i + 1], &color_index) != 0) {
@@ -265,6 +265,16 @@ int main(int argc, char **argv)
         } else if (strncmp(arg, "--color=", 8) == 0) {
             if (parse_color(arg + 8, &color_index) != 0) {
                 fprintf(stderr, "%s: 颜色编号 %s 不合法（0~255）\n", argv[0], arg + 8);
+                return 2;
+            }
+        } else if (strncmp(arg, "-C=", 3) == 0) {
+            if (parse_color(arg + 3, &color_index) != 0) {
+                fprintf(stderr, "%s: 颜色编号 %s 不合法（0~255）\n", argv[0], arg + 3);
+                return 2;
+            }
+        } else if (strncmp(arg, "-C", 2) == 0 && arg[2] != '\0') {
+            if (parse_color(arg + 2, &color_index) != 0) {
+                fprintf(stderr, "%s: 颜色编号 %s 不合法（0~255）\n", argv[0], arg + 2);
                 return 2;
             }
         } else if (strcmp(arg, "-v") == 0 || strcmp(arg, "--version") == 0) {

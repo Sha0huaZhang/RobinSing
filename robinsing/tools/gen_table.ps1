@@ -26,7 +26,7 @@ if (-not (Test-Path 'src')) { New-Item -ItemType Directory 'src' | Out-Null }
 $files = @(
     'lyrics\sway-the-beat-in-cosmos.txt',
     'lyrics\if-i-can-stop-one-heart-from-breaking.txt',
-    'lyrics\hope-is-the-sing-with-feathers.txt',
+    'lyrics\hope-is-the-thing-with-feathers.txt',
     'lyrics\had-i-not-seen-the-sun.txt'
 )
 
