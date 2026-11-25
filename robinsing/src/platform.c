@@ -16,13 +16,25 @@ void plat_nap(long ms)
     Sleep((DWORD)ms);
 }
 
-void plat_vt_on(void)
+int plat_vt_on(void)
 {
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     DWORD mode;
 
-    if (h == INVALID_HANDLE_VALUE || !GetConsoleMode(h, &mode)) return;
-    SetConsoleMode(h, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+    if (h == INVALID_HANDLE_VALUE || !GetConsoleMode(h, &mode)) return 0;
+    return SetConsoleMode(h, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
+}
+
+int plat_default_color(void)
+{
+    /* 淡紫，黑底 CMD 里比 53 显眼得多 */
+    return 141;
+}
+
+int plat_color_depth(void)
+{
+    /* 开了 VT 的 Windows 控制台认 256 色；TERM 在这边没有参考价值 */
+    return 256;
 }
 
 long long plat_now_ms(void)
@@ -34,6 +46,8 @@ long long plat_now_ms(void)
 
 #define _POSIX_C_SOURCE 200809L
 
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -57,9 +71,24 @@ void plat_nap(long ms)
     nanosleep(&ts, NULL);
 }
 
-void plat_vt_on(void)
+int plat_vt_on(void)
 {
     /* POSIX 终端本来就认 ANSI 转义序列 */
+    return 1;
+}
+
+int plat_default_color(void)
+{
+    return 53;
+}
+
+int plat_color_depth(void)
+{
+    const char *term = getenv("TERM");
+
+    /* 没设 TERM 时按 256 色处理，跟以前的行为保持一致 */
+    if (term == NULL || strstr(term, "256color") != NULL) return 256;
+    return 16;
 }
 
 long long plat_now_ms(void)

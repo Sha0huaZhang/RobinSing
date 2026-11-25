@@ -28,15 +28,16 @@ static void usage(FILE *out, const char *prog)
             "  -p, --plain         强制纯文本输出，无颜色无停顿\n"
             "  -c, --chorus, --climax  只唱高潮段（没标记就唱整首）\n"
             "  -e, --end, --ends       只唱尾声（没标记就唱整首）\n"
-            "  -C, --color <编号>      256 色编号（默认 53）；NO_COLOR / TERM=dumb 时不上色\n"
+            "  -C, --color <编号>      256 色编号（默认 %d）；NO_COLOR / TERM=dumb 时不上色\n"
             "  --                      后面的参数都当作曲目，不再解析选项\n"
             "  -v, --version       显示版本\n"
             "  -h, --help          显示本帮助\n"
             "\n"
             "带选项时：输出到终端就逐字唱，被重定向或接管道就输出纯文本。\n"
             "注意: -s 后面的值会当作速度；要同时指定曲目写成 -s 1 1 或 -s=1 1。\n"
-            "颜色也可以用环境变量 ROBINSING_COLOR=53 指定。\n",
-            prog, CHAR_MS_DEFAULT, CHAR_MS_FAST);
+            "颜色也可以用环境变量 ROBINSING_COLOR=%d 指定。\n",
+            prog, CHAR_MS_DEFAULT, CHAR_MS_FAST, plat_default_color(),
+            plat_default_color());
 }
 
 /* 曲目名统一转小写；argv 的字符串可改 */
@@ -96,19 +97,20 @@ static int parse_color(const char *text, long *out)
     return 0;
 }
 
-/* NO_COLOR / TERM=dumb 完全不上色；只支持 16 色的终端退回洋红 */
-static void setup_color(long index)
+/* NO_COLOR / TERM=dumb 完全不上色；打开不了 VT 的终端也不上色。
+   只有 16 色的终端退回亮洋红——淡紫在黑底上才显眼，深洋红不行 */
+static void setup_color(long index, int vt_ok)
 {
     const char *term = getenv("TERM");
 
-    if (getenv("NO_COLOR") != NULL ||
+    if (!vt_ok || getenv("NO_COLOR") != NULL ||
         (term != NULL && (term[0] == '\0' || strcmp(term, "dumb") == 0))) {
         g_color = "";
         return;
     }
 
-    if (term != NULL && strstr(term, "256color") == NULL)
-        strcpy(color_escape, "\033[35m");
+    if (plat_color_depth() < 256)
+        strcpy(color_escape, "\033[95m");
     else
         snprintf(color_escape, sizeof color_escape, "\033[38;5;%ldm", index);
 
@@ -128,7 +130,6 @@ static void play_song(const struct warble_song *song, long char_ms,
     if (want_color(force_plain)) {
         printf("%s" WARBLE_BOLD "%s" WARBLE_UNBOLD "\n", g_color, song->title);
         fflush(stdout);
-        plat_vt_on();
         warble_set_color(g_color);
         warble_sing(song, part, char_ms);
     } else {
@@ -202,7 +203,7 @@ static int run_menu(long char_ms, int force_plain, enum warble_part part)
 int main(int argc, char **argv)
 {
     long char_ms = CHAR_MS_DEFAULT;
-    long color_index = 53;
+    long color_index = plat_default_color();
     int force_plain = 0;
     int end_options = 0;
     enum warble_part part = WARBLE_PART_FULL;
@@ -324,7 +325,7 @@ int main(int argc, char **argv)
         }
     }
 
-    setup_color(color_index);
+    setup_color(color_index, !force_plain && plat_is_tty() && plat_vt_on());
 
     if (selector == NULL) {
         return run_menu(char_ms, force_plain, part) ? 0 : 2;

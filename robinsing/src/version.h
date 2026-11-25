@@ -1,6 +1,6 @@
 #ifndef ROBINSING_VERSION_H
 #define ROBINSING_VERSION_H
 
-#define ROBINSING_VERSION "0.1.1"
+#define ROBINSING_VERSION "0.1.2"
 
 #endif
